@@ -134,11 +134,7 @@ export default function BayModal({ bay, booking, lang, deviceId, restricted, onC
 
         {error && (
           <div className="warning-card">
-            <div className="warning-card-title">
-              {error === 'BAY_UNAVAILABLE'
-                ? lang === 'hi' ? 'यह बे अभी-अभी बुक हो गया' : 'This bay was just booked'
-                : lang === 'hi' ? 'कुछ गलत हुआ, फिर कोशिश करें' : 'Something went wrong, try again'}
-            </div>
+            <div className="warning-card-title">{errorMessage(error, lang)}</div>
           </div>
         )}
 
@@ -422,4 +418,32 @@ export default function BayModal({ bay, booking, lang, deviceId, restricted, onC
 function fruitEmoji(key) {
   const map = { mango: '🥭', tomato: '🍅', banana: '🍌', papaya: '🍈', grape: '🍇' };
   return map[key] || '📦';
+}
+
+function errorMessage(code, lang) {
+  const messages = {
+    BAY_UNAVAILABLE: {
+      en: 'This bay was just booked by someone else. Pick another bay.',
+      hi: 'यह बे किसी और ने अभी बुक कर लिया। कोई और बे चुनें।'
+    },
+    BOOKING_NOT_CANCELLABLE: {
+      en: 'This reservation already changed — it may have expired or been checked in. Refresh and try again.',
+      hi: 'यह बुकिंग पहले ही बदल गई — शायद समय खत्म हो गया या चेक-इन हो गया। ताज़ा करें और फिर कोशिश करें।'
+    },
+    BOOKING_NOT_CHECKINABLE: {
+      en: 'This reservation expired before check-in (drop-off time passed). Please reserve again.',
+      hi: 'चेक-इन से पहले यह बुकिंग खत्म हो गई (लाने का समय निकल गया)। कृपया दोबारा बुक करें।'
+    },
+    BOOKING_NOT_ACTIVE: {
+      en: 'This bay is no longer marked as occupied — someone may have already vacated it.',
+      hi: 'यह बे अब उपयोग में नहीं है — शायद पहले ही खाली हो चुका है।'
+    },
+    BOOKING_NOT_EDITABLE: {
+      en: "This reservation can't be edited anymore — it may already be checked in or cancelled.",
+      hi: 'अब इस बुकिंग को बदला नहीं जा सकता — शायद पहले ही चेक-इन या रद्द हो चुकी है।'
+    }
+  };
+  const entry = messages[code];
+  if (entry) return entry[lang] || entry.en;
+  return lang === 'hi' ? 'कुछ गलत हुआ, फिर कोशिश करें' : 'Something went wrong, try again';
 }

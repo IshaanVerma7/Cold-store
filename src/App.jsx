@@ -10,6 +10,19 @@ import Dashboard from './components/Dashboard.jsx';
 
 const EXPIRE_POLL_MS = 30000; // (D) late drop-off auto-cancel client-side fallback
 
+const KNOWN_ERRORS = [
+  'BAY_UNAVAILABLE',
+  'BOOKING_NOT_CANCELLABLE',
+  'BOOKING_NOT_CHECKINABLE',
+  'BOOKING_NOT_ACTIVE',
+  'BOOKING_NOT_EDITABLE'
+];
+
+function normalizeError(message) {
+  const found = KNOWN_ERRORS.find((code) => message && message.includes(code));
+  return found || message;
+}
+
 export default function App() {
   const [lang, setLangState] = useState(localStorage.getItem('cold_store_lang') || 'en');
   const [tab, setTab] = useState('floor');
@@ -118,14 +131,14 @@ export default function App() {
           p_expected_dropoff_time: args.expectedDropoffTime,
           p_device_id: args.deviceId
         });
-        if (error) return { error: error.message.includes('BAY_UNAVAILABLE') ? 'BAY_UNAVAILABLE' : error.message };
+        if (error) return { error: normalizeError(error.message) };
         setBookings((prev) => [data, ...prev]);
         setBays((prev) => prev.map((b) => (b.id === args.bayId ? { ...b, status: 'reserved' } : b)));
         return { data };
       }
       if (type === 'cancel') {
         const { error } = await supabase.rpc('cancel_reservation', { p_booking_id: args.bookingId });
-        if (error) return { error: error.message };
+        if (error) return { error: normalizeError(error.message) };
         return { data: true };
       }
       if (type === 'editReservation') {
@@ -138,7 +151,7 @@ export default function App() {
           p_dropoff_slot: args.dropoffSlot,
           p_expected_dropoff_time: args.expectedDropoffTime
         });
-        if (error) return { error: error.message };
+        if (error) return { error: normalizeError(error.message) };
         setBookings((prev) => prev.map((b) => (b.id === data.id ? data : b)));
         return { data };
       }
@@ -147,13 +160,13 @@ export default function App() {
           p_booking_id: args.bookingId,
           p_pickup_days: args.pickupDays
         });
-        if (error) return { error: error.message };
+        if (error) return { error: normalizeError(error.message) };
         setBookings((prev) => prev.map((b) => (b.id === data.id ? data : b)));
         return { data };
       }
       if (type === 'surrender') {
         const { error } = await supabase.rpc('surrender_bay', { p_booking_id: args.bookingId });
-        if (error) return { error: error.message };
+        if (error) return { error: normalizeError(error.message) };
         return { data: true };
       }
       if (type === 'joinWaitlist') {
@@ -164,7 +177,7 @@ export default function App() {
           p_crate_count: args.crateCount,
           p_device_id: args.deviceId
         });
-        if (error) return { error: error.message };
+        if (error) return { error: normalizeError(error.message) };
         setWaitlist((prev) => [...prev, data]);
         return { data };
       }
