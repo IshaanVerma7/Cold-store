@@ -11,14 +11,23 @@ export default function CheckInTab({ bookings, waitlist, deviceId, lang, onOpenB
     ? active.filter((b) => b.farmer_name.toLowerCase().includes(query.trim().toLowerCase()))
     : [];
 
-  const myWaitlist = waitlist.filter((w) => w.device_id === deviceId && !w.fulfilled);
+  const openWaitlist = [...waitlist].filter((w) => !w.fulfilled).sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+  const myWaitlist = openWaitlist.filter((w) => w.device_id === deviceId);
+  const myWaitlistPosition = myWaitlist.length > 0 ? openWaitlist.findIndex((w) => w.id === myWaitlist[0].id) + 1 : null;
 
   return (
     <div className="screen">
       <div className="section-title">📋 {t('checkInReserve', lang)}</div>
 
       {mine.length > 0 ? (
-        mine.map((b) => <BookingRow key={b.id} booking={b} lang={lang} onOpen={onOpenBooking} />)
+        <>
+          <div className="section-title" style={{ marginTop: 0 }}>
+            🙋 {mine.length > 1 ? t('yourBookings', lang) : t('yourBooking', lang)}
+          </div>
+          {mine.map((b) => (
+            <BookingRow key={b.id} booking={b} lang={lang} onOpen={onOpenBooking} />
+          ))}
+        </>
       ) : (
         <>
           <div className="empty-state">{t('noBookingFound', lang)}</div>
@@ -39,6 +48,7 @@ export default function CheckInTab({ bookings, waitlist, deviceId, lang, onOpenB
         <div className="booking-row" style={{ borderColor: 'var(--orange)' }}>
           <div className="booking-row-top">
             <span className="booking-row-name">⏳ {t('waitlistJoined', lang)}</span>
+            <span className="sheet-badge pill-waiting">#{myWaitlistPosition}</span>
           </div>
           <div style={{ fontSize: 13, color: 'var(--text-2)' }}>
             {fruitLabel(myWaitlist[0].fruit_type, lang)} · {myWaitlist[0].crate_count} {t('crates', lang)}

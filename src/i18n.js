@@ -84,7 +84,9 @@ export const T = {
   detailsPrivate: {
     en: "This is another farmer's bay. Their name, phone and code are private.",
     hi: 'यह किसी और किसान का बे है। उनका नाम, फ़ोन और कोड निजी है।'
-  }
+  },
+  yourBooking: { en: 'Your Booking', hi: 'आपकी बुकिंग' },
+  yourBookings: { en: 'Your Bookings', hi: 'आपकी बुकिंगें' }
 };
 
 export function t(key, lang) {
