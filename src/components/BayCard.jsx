@@ -2,7 +2,7 @@ import React from 'react';
 import { t, fruitName } from '../i18n.js';
 import { speak } from '../speak.js';
 
-export default function BayCard({ bay, booking, lang, onOpen }) {
+export default function BayCard({ bay, booking, lang, deviceId, onOpen }) {
   const isOverdue =
     booking &&
     booking.status === 'occupied' &&
@@ -10,13 +10,17 @@ export default function BayCard({ bay, booking, lang, onOpen }) {
     new Date(booking.expected_pickup_time) < new Date();
 
   const isLocked = bay.status === 'reserved' || bay.status === 'occupied';
+  const isOwnBooking = booking && booking.device_id === deviceId;
 
   function announce(e) {
     e.stopPropagation();
     const statusWord = t(bay.status, lang);
     let line = `${t('bay', lang)} ${bay.id}. ${statusWord}.`;
     if (booking) {
-      line += ` ${fruitName(booking.fruit_type, lang)}. ${t('farmer', lang)}: ${booking.farmer_name}.`;
+      line += ` ${fruitName(booking.fruit_type, lang)}.`;
+      if (isOwnBooking) {
+        line += ` ${t('farmer', lang)}: ${booking.farmer_name}.`;
+      }
     }
     speak(line, lang);
   }

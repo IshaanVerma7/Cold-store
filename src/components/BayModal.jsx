@@ -32,7 +32,7 @@ const todayStr = (() => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 })();
 
-export default function BayModal({ bay, booking, lang, deviceId, onClose, onAction }) {
+export default function BayModal({ bay, booking, lang, deviceId, restricted, onClose, onAction }) {
   const [step, setStep] = useState(bay.status === 'available' ? 'fruit' : 'view');
   const [isEditing, setIsEditing] = useState(false);
   const [fruit, setFruit] = useState(null);
@@ -263,8 +263,28 @@ export default function BayModal({ bay, booking, lang, deviceId, onClose, onActi
           </>
         )}
 
+        {/* ---------------- RESTRICTED: someone else's bay, tapped from the public floor map ---------------- */}
+        {restricted && (bay.status === 'reserved' || bay.status === 'occupied') && booking && (
+          <>
+            <div
+              className="big-status-box"
+              style={{ background: bay.status === 'occupied' ? 'var(--red-bg)' : 'var(--orange-bg)' }}
+            >
+              <div className="big-emoji">🔒</div>
+              <div style={{ fontWeight: 800, marginTop: 6 }}>{fruitLabel(booking.fruit_type, lang)}</div>
+            </div>
+            <div className="info-row">
+              <span className="label">{t('crates', lang)}</span>
+              <span className="value">{booking.crate_count}</span>
+            </div>
+            <div className="empty-state" style={{ padding: '16px 4px' }}>
+              🔒 {t('detailsPrivate', lang)}
+            </div>
+          </>
+        )}
+
         {/* ---------------- RESERVED: check-in, edit, or cancel ---------------- */}
-        {bay.status === 'reserved' && step === 'view' && booking && (
+        {!restricted && bay.status === 'reserved' && step === 'view' && booking && (
           <>
             <div className="big-status-box" style={{ background: 'var(--orange-bg)' }}>
               <div className="big-emoji">{fruitEmoji(booking.fruit_type)}</div>
@@ -355,7 +375,7 @@ export default function BayModal({ bay, booking, lang, deviceId, onClose, onActi
         )}
 
         {/* ---------------- OCCUPIED: show code + surrender ---------------- */}
-        {bay.status === 'occupied' && step === 'view' && booking && (
+        {!restricted && bay.status === 'occupied' && step === 'view' && booking && (
           <>
             <div className="big-status-box" style={{ background: 'var(--red-bg)' }}>
               <div className="big-emoji">{fruitEmoji(booking.fruit_type)}</div>

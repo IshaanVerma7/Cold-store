@@ -80,7 +80,11 @@ export const T = {
   selectDate: { en: 'Select Date', hi: 'तारीख चुनें' },
   selectTime: { en: 'Select Time', hi: 'समय चुनें' },
   editReservation: { en: 'Edit Reservation', hi: 'बुकिंग बदलें' },
-  saveChanges: { en: 'Save Changes', hi: 'बदलाव सुरक्षित करें' }
+  saveChanges: { en: 'Save Changes', hi: 'बदलाव सुरक्षित करें' },
+  detailsPrivate: {
+    en: "This is another farmer's bay. Their name, phone and code are private.",
+    hi: 'यह किसी और किसान का बे है। उनका नाम, फ़ोन और कोड निजी है।'
+  }
 };
 
 export function t(key, lang) {

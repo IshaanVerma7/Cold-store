@@ -18,6 +18,7 @@ export default function App() {
   const [waitlist, setWaitlist] = useState([]);
   const [room, setRoom] = useState({ cooling_status: 'on', temperature: 4, humidity: 90 });
   const [selectedBayId, setSelectedBayId] = useState(null);
+  const [modalSource, setModalSource] = useState('floor'); // 'floor' | 'checkin'
   const [bumpAlert, setBumpAlert] = useState(null);
   const [loading, setLoading] = useState(true);
   const deviceId = useMemo(() => getDeviceId(), []);
@@ -200,7 +201,13 @@ export default function App() {
       )}
 
       {tab === 'floor' && (
-        <FloorMap bays={bays} bookingsByBay={bookingsByBay} lang={lang} onOpenBay={(bay) => setSelectedBayId(bay.id)} />
+        <FloorMap
+          bays={bays}
+          bookingsByBay={bookingsByBay}
+          lang={lang}
+          deviceId={deviceId}
+          onOpenBay={(bay) => { setModalSource('floor'); setSelectedBayId(bay.id); }}
+        />
       )}
       {tab === 'checkin' && (
         <CheckInTab
@@ -210,7 +217,7 @@ export default function App() {
           lang={lang}
           allBaysFull={allBaysFull}
           onAction={handleAction}
-          onOpenBooking={(booking) => setSelectedBayId(booking.bay_id)}
+          onOpenBooking={(booking) => { setModalSource('checkin'); setSelectedBayId(booking.bay_id); }}
         />
       )}
       {tab === 'dashboard' && <Dashboard bays={bays} bookings={bookings} waitlist={waitlist} lang={lang} />}
@@ -223,6 +230,11 @@ export default function App() {
           booking={selectedBooking}
           lang={lang}
           deviceId={deviceId}
+          restricted={
+            modalSource === 'floor' &&
+            selectedBooking &&
+            selectedBooking.device_id !== deviceId
+          }
           onClose={() => setSelectedBayId(null)}
           onAction={handleAction}
         />

@@ -2,8 +2,7 @@ import React from 'react';
 import BayCard from './BayCard.jsx';
 import { t } from '../i18n.js';
 
-
-export default function FloorMap({ bays, bookingsByBay, lang, onOpenBay }) {
+export default function FloorMap({ bays, bookingsByBay, lang, deviceId, onOpenBay }) {
   const sorted = [...bays].sort((a, b) => a.id - b.id);
   const firstSix = sorted.slice(0, 6);
   const lastSix = sorted.slice(6, 12);
@@ -18,6 +17,7 @@ export default function FloorMap({ bays, bookingsByBay, lang, onOpenBay }) {
             bay={bay}
             booking={bookingsByBay[bay.id]}
             lang={lang}
+            deviceId={deviceId}
             onOpen={onOpenBay}
           />
         ))}
@@ -28,6 +28,7 @@ export default function FloorMap({ bays, bookingsByBay, lang, onOpenBay }) {
             bay={bay}
             booking={bookingsByBay[bay.id]}
             lang={lang}
+            deviceId={deviceId}
             onOpen={onOpenBay}
           />
         ))}
